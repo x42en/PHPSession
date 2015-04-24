@@ -26,6 +26,7 @@ module.exports = class PHPSession
 		@mem = new Memcached("#{host}:#{port}")
 
 	get: ({id}) ->
+		session = ''
 		@mem.get "sessions/#{id}", (err, raw) =>
 			if err? or not raw? or raw.length is 0
 				return
