@@ -1,5 +1,5 @@
 /****************************************************/
-/*         PHPSession - v0.1.1                      */
+/*         PHPSession - v0.1.2                      */
 /*                                                  */
 /*         Manage $_SESSION var in node.js          */
 /****************************************************/
@@ -30,18 +30,19 @@
     }
 
     PHPSession.prototype.get = function(_arg) {
-      var id;
-      id = _arg.id;
-      this.mem.get("sessions/" + id, (function(_this) {
+      var cb, id, session;
+      id = _arg.id, cb = _arg.cb;
+      session = '';
+      return this.mem.get("sessions/" + id, (function(_this) {
         return function(err, raw) {
-          var session;
           if ((err != null) || (raw == null) || raw.length === 0) {
-            return;
+            return cb();
+          } else {
+            session = JSON.parse(raw);
+            return cb(session);
           }
-          return session = JSON.parse(raw);
         };
       })(this));
-      return session;
     };
 
     PHPSession.prototype.set = function(_arg) {

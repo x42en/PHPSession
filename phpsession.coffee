@@ -25,14 +25,14 @@ module.exports = class PHPSession
 
 		@mem = new Memcached("#{host}:#{port}")
 
-	get: ({id}) ->
+	get: ({id, cb}) ->
 		session = ''
 		@mem.get "sessions/#{id}", (err, raw) =>
 			if err? or not raw? or raw.length is 0
-				return
-
-			session = JSON.parse(raw)
-		return session
+				cb()
+			else
+				session = JSON.parse(raw)
+				cb session
 
 	set: ({id, json, lifetime, cb}) ->
 		unless id?

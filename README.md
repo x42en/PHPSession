@@ -58,7 +58,7 @@ Delete $_SESSION id:
 
 ## Extended usage
 
-All methods, except get, supports callback parameters:
+All methods supports callback parameters:
   ```coffeescript
     sess.set
       ressource: '9eir0ul21knvmlhu0a4kleh8j1'
