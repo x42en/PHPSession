@@ -1,6 +1,6 @@
 {
   "name": "phpsession",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Manage PHP $_SESSION var stored in JSON with node.js, using memcached server",
   "main": "phpsession.js",
   "scripts": {
