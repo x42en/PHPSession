@@ -1,5 +1,5 @@
 /****************************************************/
-/*         PHPSession - v0.1.2                      */
+/*         PHPSession - v0.1.3                      */
 /*                                                  */
 /*         Manage $_SESSION var in node.js          */
 /****************************************************/
@@ -46,7 +46,7 @@
     };
 
     PHPSession.prototype.set = function(_arg) {
-      var cb, content, id, json, lifetime, session;
+      var cb, id, json, lifetime;
       id = _arg.id, json = _arg.json, lifetime = _arg.lifetime, cb = _arg.cb;
       if (id == null) {
         return;
@@ -57,23 +57,30 @@
       if (cb == null) {
         cb = console.log;
       }
-      session = this.get(id);
-      if (session != null) {
-        content = JSON.stringify(json);
-        return this.mem.set("sessions/" + id, content, lifetime, (function(_this) {
-          return function(err) {
-            if (err != null) {
-              return cb(err);
+      return this.get({
+        id: id,
+        cb: (function(_this) {
+          return function(session) {
+            var content;
+            if (session != null) {
+              content = JSON.stringify(json);
+              return _this.mem.set("sessions/" + id, content, lifetime, function(err) {
+                if (err != null) {
+                  return cb(err);
+                } else {
+                  return cb();
+                }
+              });
             } else {
-              return cb();
+              return cb('ERRNOSESS');
             }
           };
-        })(this));
-      }
+        })(this)
+      });
     };
 
     PHPSession.prototype.update = function(_arg) {
-      var cb, content, id, key, lifetime, session, value;
+      var cb, id, key, lifetime, value;
       id = _arg.id, key = _arg.key, value = _arg.value, lifetime = _arg.lifetime, cb = _arg.cb;
       if (!((key != null) && (id != null))) {
         return;
@@ -84,24 +91,31 @@
       if (cb == null) {
         cb = console.log;
       }
-      session = this.get(id);
-      if (session != null) {
-        session[key] = value;
-        content = JSON.stringify(session);
-        return this.mem.set("sessions/" + id, content, lifetime, (function(_this) {
-          return function(err) {
-            if (err != null) {
-              return cb(err);
+      return this.get({
+        id: id,
+        cb: (function(_this) {
+          return function(session) {
+            var content;
+            if (session != null) {
+              session[key] = value;
+              content = JSON.stringify(session);
+              return _this.mem.set("sessions/" + id, content, lifetime, function(err) {
+                if (err != null) {
+                  return cb(err);
+                } else {
+                  return cb();
+                }
+              });
             } else {
-              return cb();
+              return cb('ERRNOSESS');
             }
           };
-        })(this));
-      }
+        })(this)
+      });
     };
 
     PHPSession.prototype["delete"] = function(_arg) {
-      var cb, id, session;
+      var cb, id;
       id = _arg.id, cb = _arg.cb;
       if (id == null) {
         return;
@@ -109,15 +123,23 @@
       if (cb == null) {
         cb = console.log;
       }
-      session = this.get(id);
-      if (session != null) {
-        return this.set({
-          id: id,
-          raw: null,
-          lifetime: 0,
-          cb: cb
-        });
-      }
+      return this.get({
+        id: id,
+        cb: (function(_this) {
+          return function(session) {
+            if (session != null) {
+              return _this.set({
+                id: id,
+                raw: null,
+                lifetime: 0,
+                cb: cb
+              });
+            } else {
+              return cb('ERRNOSESS');
+            }
+          };
+        })(this)
+      });
     };
 
     return PHPSession;

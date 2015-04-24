@@ -44,14 +44,18 @@ module.exports = class PHPSession
 		unless cb?
 			cb = console.log
 
-		session = @get id
-		if session?
-			content = JSON.stringify json
-			@mem.set "sessions/#{id}", content, lifetime, (err) =>
-				if err?
-					cb err
+		@get
+			id: id
+			cb: (session) =>
+				if session?
+					content = JSON.stringify json
+					@mem.set "sessions/#{id}", content, lifetime, (err) =>
+						if err?
+							cb err
+						else
+							cb()
 				else
-					cb()
+					cb 'ERRNOSESS'
 
 	update: ({id, key, value, lifetime, cb}) ->
 		unless key? and id?
@@ -63,15 +67,19 @@ module.exports = class PHPSession
 		unless cb?
 			cb = console.log
 
-		session = @get id
-		if session?
-			session[key] = value
-			content = JSON.stringify session
-			@mem.set "sessions/#{id}", content, lifetime, (err) =>
-				if err?
-					cb err
+		@get
+			id: id
+			cb: (session) =>
+				if session?
+					session[key] = value
+					content = JSON.stringify session
+					@mem.set "sessions/#{id}", content, lifetime, (err) =>
+						if err?
+							cb err
+						else
+							cb()
 				else
-					cb()
+					cb 'ERRNOSESS'
 
 	delete: ({id, cb}) ->
 		unless id?
@@ -80,10 +88,14 @@ module.exports = class PHPSession
 		unless cb?
 			cb = console.log
 
-		session = @get id
-		if session?
-			@set
-				id: id
-				raw: null
-				lifetime: 0
-				cb: cb
+		@get
+			id: id
+			cb: (session) =>
+				if session?
+					@set
+						id: id
+						raw: null
+						lifetime: 0
+						cb: cb
+				else
+					cb 'ERRNOSESS'
