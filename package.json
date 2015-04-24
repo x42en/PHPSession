@@ -1,0 +1,29 @@
+{
+  "name": "phpsession",
+  "version": "0.1.1",
+  "description": "Manage PHP $_SESSION var stored in JSON with node.js, using memcached server",
+  "main": "phpsession.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/x62en/PHPSession"
+  },
+  "keywords": [
+    "PHP",
+    "Session",
+    "node.js",
+    "memcached",
+    "memcache"
+  ],
+  "author": "Ben Mz",
+  "license": "Apache v2.0",
+  "bugs": {
+    "url": "https://github.com/x62en/PHPSession/issues"
+  },
+  "homepage": "https://github.com/x62en/PHPSession",
+  "dependencies": {
+    "memcached": "^2.1.0"
+  }
+}
