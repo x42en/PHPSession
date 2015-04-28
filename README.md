@@ -2,7 +2,8 @@
 
 [![NPM](https://nodei.co/npm/phpsession.png?compact=true)](https://nodei.co/npm/phpsession/)
 
-Simple module to manipulate PHP session vars ($_SESSION) stored in JSON, using memcached (* careful not memcache! *)
+Simple module to manipulate PHP session vars ($_SESSION) stored in JSON, using *memcached*  
+>CAREFUL: this is NEW version of memcache !
 
 ## Install
 
@@ -32,9 +33,17 @@ Retrieve $_SESSION value:
       id: '9eir0ul21knvmlhu0a4kleh8j1'
   ```
 
-Replace $_SESSION var:
+Define a $_SESSION var:
   ```coffeescript
     sess.set
+      id: '9eir0ul21knvmlhu0a4kleh8j1'
+      json: { 'hello': 'world' }
+      lifetime: 1440
+  ```
+
+Replace a $_SESSION var:
+  ```coffeescript
+    sess.replace
       id: '9eir0ul21knvmlhu0a4kleh8j1'
       json: { 'hello': 'world' }
       lifetime: 1440
