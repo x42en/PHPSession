@@ -1,5 +1,5 @@
 /****************************************************/
-/*         PHPSession - v0.1.4                      */
+/*         PHPSession - v0.1.5                      */
 /*                                                  */
 /*         Manage $_SESSION var in node.js          */
 /****************************************************/
@@ -80,6 +80,41 @@
       });
     };
 
+    PHPSession.prototype.replace = function(_arg) {
+      var cb, id, json, lifetime;
+      id = _arg.id, json = _arg.json, lifetime = _arg.lifetime, cb = _arg.cb;
+      if (id == null) {
+        cb('ERRMISSPARAM');
+        return;
+      }
+      if (lifetime == null) {
+        lifetime = 1440;
+      }
+      if (cb == null) {
+        cb = console.log;
+      }
+      return this.get({
+        id: id,
+        cb: (function(_this) {
+          return function(session) {
+            var content;
+            if (session != null) {
+              content = JSON.stringify(json);
+              return _this.mem.replace("sessions/" + id, content, lifetime, function(err) {
+                if (err != null) {
+                  return cb(err);
+                } else {
+                  return cb();
+                }
+              });
+            } else {
+              return cb('ERRNOSESS');
+            }
+          };
+        })(this)
+      });
+    };
+
     PHPSession.prototype.update = function(_arg) {
       var cb, id, key, lifetime, value;
       id = _arg.id, key = _arg.key, value = _arg.value, lifetime = _arg.lifetime, cb = _arg.cb;
@@ -101,7 +136,7 @@
             if (session != null) {
               session[key] = value;
               content = JSON.stringify(session);
-              return _this.mem.set("sessions/" + id, content, lifetime, function(err) {
+              return _this.mem.replace("sessions/" + id, content, lifetime, function(err) {
                 if (err != null) {
                   return cb(err);
                 } else {
