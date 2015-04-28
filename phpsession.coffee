@@ -36,6 +36,7 @@ module.exports = class PHPSession
 
 	set: ({id, json, lifetime, cb}) ->
 		unless id?
+			cb 'ERRMISSPARAM'
 			return
 
 		unless lifetime?
@@ -59,6 +60,7 @@ module.exports = class PHPSession
 
 	update: ({id, key, value, lifetime, cb}) ->
 		unless key? and id?
+			cb 'ERRMISSPARAM'
 			return
 
 		unless lifetime?
@@ -83,6 +85,7 @@ module.exports = class PHPSession
 
 	delete: ({id, cb}) ->
 		unless id?
+			cb 'ERRMISSPARAM'
 			return
 
 		unless cb?
@@ -92,10 +95,10 @@ module.exports = class PHPSession
 			id: id
 			cb: (session) =>
 				if session?
-					@set
-						id: id
-						raw: null
-						lifetime: 0
-						cb: cb
+					@mem.del "sessions/#{id}", (err) =>
+						if err?
+							cb err
+						else
+							cb()
 				else
 					cb 'ERRNOSESS'
