@@ -1,5 +1,5 @@
 /****************************************************/
-/*         PHPSession - v0.1.3                      */
+/*         PHPSession - v0.1.4                      */
 /*                                                  */
 /*         Manage $_SESSION var in node.js          */
 /****************************************************/
@@ -49,6 +49,7 @@
       var cb, id, json, lifetime;
       id = _arg.id, json = _arg.json, lifetime = _arg.lifetime, cb = _arg.cb;
       if (id == null) {
+        cb('ERRMISSPARAM');
         return;
       }
       if (lifetime == null) {
@@ -83,6 +84,7 @@
       var cb, id, key, lifetime, value;
       id = _arg.id, key = _arg.key, value = _arg.value, lifetime = _arg.lifetime, cb = _arg.cb;
       if (!((key != null) && (id != null))) {
+        cb('ERRMISSPARAM');
         return;
       }
       if (lifetime == null) {
@@ -118,6 +120,7 @@
       var cb, id;
       id = _arg.id, cb = _arg.cb;
       if (id == null) {
+        cb('ERRMISSPARAM');
         return;
       }
       if (cb == null) {
@@ -128,11 +131,12 @@
         cb: (function(_this) {
           return function(session) {
             if (session != null) {
-              return _this.set({
-                id: id,
-                raw: null,
-                lifetime: 0,
-                cb: cb
+              return _this.mem.del("sessions/" + id, function(err) {
+                if (err != null) {
+                  return cb(err);
+                } else {
+                  return cb();
+                }
               });
             } else {
               return cb('ERRNOSESS');
