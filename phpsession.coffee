@@ -58,6 +58,30 @@ module.exports = class PHPSession
 				else
 					cb 'ERRNOSESS'
 
+	replace: ({id, json, lifetime, cb}) ->
+		unless id?
+			cb 'ERRMISSPARAM'
+			return
+
+		unless lifetime?
+			lifetime = 1440
+
+		unless cb?
+			cb = console.log
+
+		@get
+			id: id
+			cb: (session) =>
+				if session?
+					content = JSON.stringify json
+					@mem.replace "sessions/#{id}", content, lifetime, (err) =>
+						if err?
+							cb err
+						else
+							cb()
+				else
+					cb 'ERRNOSESS'
+
 	update: ({id, key, value, lifetime, cb}) ->
 		unless key? and id?
 			cb 'ERRMISSPARAM'
@@ -75,7 +99,7 @@ module.exports = class PHPSession
 				if session?
 					session[key] = value
 					content = JSON.stringify session
-					@mem.set "sessions/#{id}", content, lifetime, (err) =>
+					@mem.replace "sessions/#{id}", content, lifetime, (err) =>
 						if err?
 							cb err
 						else
