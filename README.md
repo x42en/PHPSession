@@ -49,6 +49,13 @@ Replace a $_SESSION var:
       lifetime: 1440
   ```
 
+Refresh a $_SESSION:
+  ```coffeescript
+    sess.refresh
+      id: '9eir0ul21knvmlhu0a4kleh8j1'
+      lifetime: 1440
+  ```
+
 Update specific $_SESSION key:
   ```coffeescript
     sess.update
