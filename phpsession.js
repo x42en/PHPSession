@@ -1,5 +1,5 @@
 /****************************************************/
-/*         PHPSession - v0.1.5                      */
+/*         PHPSession - v0.1.6                      */
 /*                                                  */
 /*         Manage $_SESSION var in node.js          */
 /****************************************************/
@@ -11,27 +11,28 @@
 /*                                                  */
 /****************************************************/
 
+
 (function() {
   var Memcached, PHPSession;
 
   Memcached = require('memcached');
 
   module.exports = PHPSession = (function() {
-    function PHPSession(_arg) {
+    function PHPSession(arg) {
       var host, port;
-      host = _arg.host, port = _arg.port;
+      host = arg.host, port = arg.port;
       if (host == null) {
         host = '127.0.0.1';
       }
       if (port == null) {
         port = '11211';
       }
-      this.mem = new Memcached("" + host + ":" + port);
+      this.mem = new Memcached(host + ":" + port);
     }
 
-    PHPSession.prototype.get = function(_arg) {
+    PHPSession.prototype.get = function(arg) {
       var cb, id, session;
-      id = _arg.id, cb = _arg.cb;
+      id = arg.id, cb = arg.cb;
       session = '';
       return this.mem.get("sessions/" + id, (function(_this) {
         return function(err, raw) {
@@ -45,9 +46,9 @@
       })(this));
     };
 
-    PHPSession.prototype.set = function(_arg) {
+    PHPSession.prototype.set = function(arg) {
       var cb, id, json, lifetime;
-      id = _arg.id, json = _arg.json, lifetime = _arg.lifetime, cb = _arg.cb;
+      id = arg.id, json = arg.json, lifetime = arg.lifetime, cb = arg.cb;
       if (id == null) {
         cb('ERRMISSPARAM');
         return;
@@ -80,9 +81,9 @@
       });
     };
 
-    PHPSession.prototype.replace = function(_arg) {
+    PHPSession.prototype.replace = function(arg) {
       var cb, id, json, lifetime;
-      id = _arg.id, json = _arg.json, lifetime = _arg.lifetime, cb = _arg.cb;
+      id = arg.id, json = arg.json, lifetime = arg.lifetime, cb = arg.cb;
       if (id == null) {
         cb('ERRMISSPARAM');
         return;
@@ -115,9 +116,44 @@
       });
     };
 
-    PHPSession.prototype.update = function(_arg) {
+    PHPSession.prototype.refresh = function(arg) {
+      var cb, id, lifetime;
+      id = arg.id, lifetime = arg.lifetime, cb = arg.cb;
+      if (id == null) {
+        cb('ERRMISSPARAM');
+        return;
+      }
+      if (lifetime == null) {
+        lifetime = 1440;
+      }
+      if (cb == null) {
+        cb = console.log;
+      }
+      return this.get({
+        id: id,
+        cb: (function(_this) {
+          return function(session) {
+            var content;
+            if (session != null) {
+              content = JSON.stringify(session);
+              return _this.mem.replace("sessions/" + id, content, lifetime, function(err) {
+                if (err != null) {
+                  return cb(err);
+                } else {
+                  return cb();
+                }
+              });
+            } else {
+              return cb('ERRNOSESS');
+            }
+          };
+        })(this)
+      });
+    };
+
+    PHPSession.prototype.update = function(arg) {
       var cb, id, key, lifetime, value;
-      id = _arg.id, key = _arg.key, value = _arg.value, lifetime = _arg.lifetime, cb = _arg.cb;
+      id = arg.id, key = arg.key, value = arg.value, lifetime = arg.lifetime, cb = arg.cb;
       if (!((key != null) && (id != null))) {
         cb('ERRMISSPARAM');
         return;
@@ -151,9 +187,9 @@
       });
     };
 
-    PHPSession.prototype["delete"] = function(_arg) {
+    PHPSession.prototype["delete"] = function(arg) {
       var cb, id;
-      id = _arg.id, cb = _arg.cb;
+      id = arg.id, cb = arg.cb;
       if (id == null) {
         cb('ERRMISSPARAM');
         return;
