@@ -2,6 +2,11 @@
 
 [![NPM](https://nodei.co/npm/phpsession.png?compact=true)](https://nodei.co/npm/phpsession/)
 
+[![Downloads per month](https://img.shields.io/npm/dm/phpsession.svg?maxAge=2592000)](https://www.npmjs.org/package/phpsession)
+[![npm version](https://img.shields.io/npm/v/phpsession.svg)](https://www.npmjs.org/package/phpsession)
+[![Build Status](https://travis-ci.org/x42en/phpsession.svg?branch=master)](https://travis-ci.org/x42en/phpsession)
+[![Dependencies](https://david-dm.org/x42en/phpsession.svg)](https://www.npmjs.org/package/phpsession)
+
 Simple module to manipulate PHP session vars ($_SESSION) stored in JSON, using *memcached*  
 >CAREFUL: this is NEW version of memcache !
 
