@@ -17,136 +17,118 @@
 Memcached = require 'memcached'
 
 module.exports = class PHPSession
-	constructor: ({host, port}) ->
-		unless host?
-			host = '127.0.0.1'
-		unless port?
-			port = '11211'
+    connected = false
+    constructor: () ->
+        try
+            @mem = new Memcached()
+        catch err
+            throw err
 
-		@mem = new Memcached("#{host}:#{port}")
+    connect: ({host, port}={}, cb) ->
+        unless host
+            host = '127.0.0.1'
+        unless port
+            port = '11211'
 
-	get: ({id, cb}) ->
-		session = ''
-		@mem.get "sessions/#{id}", (err, raw) =>
-			if err? or not raw? or raw.length is 0
-				cb()
-			else
-				session = JSON.parse(raw)
-				cb session
+        @mem.connect "#{host}:#{port}", (err, conn) =>
+            if err
+                throw err
+            @connected = true
+            cb true
+        
 
-	set: ({id, json, lifetime, cb}) ->
-		unless id?
-			cb 'ERRMISSPARAM'
-			return
+    isConnected: -> @connected
 
-		unless lifetime?
-			lifetime = 1440
+    get: ({id}={}, cb) ->
+        unless id
+            throw 'No id set'
 
-		unless cb?
-			cb = console.log
+        @mem.get "sessions/#{id}", (err, raw) ->
+            if err
+                throw err
+            if typeof cb is "function"
+                try
+                    cb JSON.parse(raw)
+                catch e
+                    cb raw
 
-		@get
-			id: id
-			cb: (session) =>
-				if session?
-					content = JSON.stringify json
-					@mem.set "sessions/#{id}", content, lifetime, (err) =>
-						if err?
-							cb err
-						else
-							cb()
-				else
-					cb 'ERRNOSESS'
+    set: ({id, data, lifetime}={}, cb) ->
+        unless id
+            throw 'No id set'
+        unless lifetime
+            lifetime = 1440
+        unless data
+            data = {}
 
-	replace: ({id, json, lifetime, cb}) ->
-		unless id?
-			cb 'ERRMISSPARAM'
-			return
+        content = JSON.stringify data
+        @mem.set "sessions/#{id}", content, lifetime, (err) ->
+            if err
+                throw err
+            if typeof cb is "function"
+                cb true
+                
+    replace: ({id, data, lifetime}={}, cb) ->
+        unless id
+            throw 'No id set'
+        unless lifetime
+            lifetime = 1440
+        unless data
+            data = {}
 
-		unless lifetime?
-			lifetime = 1440
+        content = JSON.stringify data
+        @mem.replace "sessions/#{id}", content, lifetime, (err) ->
+            if err
+                throw err
+            if typeof cb is "function"
+                cb true
+                
+    refresh: ({id, lifetime}={}, cb) ->
+        unless id
+            throw 'No id set'
+        unless lifetime
+            lifetime = 1440
 
-		unless cb?
-			cb = console.log
+        @get
+            id: id
+            ,(session) =>
+                unless session
+                    throw 'No session found'
 
-		@get
-			id: id
-			cb: (session) =>
-				if session?
-					content = JSON.stringify json
-					@mem.replace "sessions/#{id}", content, lifetime, (err) =>
-						if err?
-							cb err
-						else
-							cb()
-				else
-					cb 'ERRNOSESS'
+                content = JSON.stringify session
+                @mem.replace "sessions/#{id}", content, lifetime, (err) ->
+                    if err
+                        throw err
+                    if typeof cb is "function"
+                        cb true
+                
+    update: ({id, key, value, lifetime}={}, cb) ->
+        unless id
+            throw 'No id set'
+        unless key
+            throw 'No key set'
+        unless lifetime
+            lifetime = 1440
 
-	refresh: ({id, lifetime, cb}) ->
-		unless id?
-			cb 'ERRMISSPARAM'
-			return
+        @get
+            id: id
+            , (session) =>
+                unless session
+                    throw 'No session found'
 
-		unless lifetime?
-			lifetime = 1440
+                session[key] = value
+                content = JSON.stringify session
+                @mem.replace "sessions/#{id}", content, lifetime, (err) ->
+                    if err
+                        throw err
+                    if typeof cb is "function"
+                        cb true
+                
+    delete: ({id}={}, cb) ->
+        unless id
+            throw 'No id set'
 
-		unless cb?
-			cb = console.log
-
-		@get
-			id: id
-			cb: (session) =>
-				if session?
-					content = JSON.stringify session
-					@mem.replace "sessions/#{id}", content, lifetime, (err) =>
-						if err?
-							cb err
-						else
-							cb()
-				else
-					cb 'ERRNOSESS'
-
-	update: ({id, key, value, lifetime, cb}) ->
-		unless key? and id?
-			cb 'ERRMISSPARAM'
-			return
-
-		unless lifetime?
-			lifetime = 1440
-
-		unless cb?
-			cb = console.log
-
-		@get
-			id: id
-			cb: (session) =>
-				if session?
-					session[key] = value
-					content = JSON.stringify session
-					@mem.replace "sessions/#{id}", content, lifetime, (err) =>
-						if err?
-							cb err
-						else
-							cb()
-				else
-					cb 'ERRNOSESS'
-
-	delete: ({id, cb}) ->
-		unless id?
-			cb 'ERRMISSPARAM'
-			return
-
-		unless cb?
-			cb = console.log
-
-		@get
-			id: id
-			cb: (session) =>
-				if session?
-					@mem.del "sessions/#{id}", (err) =>
-						if err?
-							cb err
-						else
-							cb()
-				else
-					cb 'ERRNOSESS'
+        @mem.del "sessions/#{id}", (err) ->
+            if err
+                throw err
+            if typeof cb is "function"
+                cb true
