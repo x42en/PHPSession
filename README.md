@@ -27,7 +27,7 @@ Require the module:
     PHPSESSION = require 'phpsession'
   ```
 
-Instantiate with URL:
+Instantiate:
   ```coffeescript
     sess = new PHPSESSION()
   ```
