@@ -21,42 +21,56 @@ Require the module:
 
 Instantiate with URL:
   ```coffeescript
-    sess = new PHPSESSION
-            host: 127.0.0.1
-            port: 11211
+    sess = new PHPSESSION()
   ```
 
 
-Retrieve $_SESSION value:
+## Method usage:
+
+### Connect to server:
+  ```coffeescript
+    sess.connect
+      host: 127.0.0.1  # Default value
+      port: 11211      # Default value
+  ```
+
+### Check server is connected
+  ```coffeescript
+    if sess.isConnected()
+      console.log 'All right !!'
+  ```
+
+### Retrieve $_SESSION value:
   ```coffeescript
     sess.get
       id: '9eir0ul21knvmlhu0a4kleh8j1'
+      ,(data) -> console.log data
   ```
 
-Define a $_SESSION var:
+### Define a $_SESSION var:
   ```coffeescript
     sess.set
       id: '9eir0ul21knvmlhu0a4kleh8j1'
-      json: { 'hello': 'world' }
+      data: { 'hello': 'world' }
       lifetime: 1440
   ```
 
-Replace a $_SESSION var:
+### Replace a $_SESSION var:
   ```coffeescript
     sess.replace
       id: '9eir0ul21knvmlhu0a4kleh8j1'
-      json: { 'hello': 'world' }
+      data: { 'hello': 'world' }
       lifetime: 1440
   ```
 
-Refresh a $_SESSION:
+### Refresh a $_SESSION:
   ```coffeescript
     sess.refresh
       id: '9eir0ul21knvmlhu0a4kleh8j1'
       lifetime: 1440
   ```
 
-Update specific $_SESSION key:
+### Update specific $_SESSION key:
   ```coffeescript
     sess.update
       id: '9eir0ul21knvmlhu0a4kleh8j1'
@@ -65,7 +79,7 @@ Update specific $_SESSION key:
       lifetime: 1440
   ```
 
-Delete $_SESSION id:
+### Delete $_SESSION id:
   ```coffeescript
     sess.delete
       id: '9eir0ul21knvmlhu0a4kleh8j1'
@@ -77,7 +91,16 @@ Delete $_SESSION id:
 All methods supports callback parameters:
   ```coffeescript
     sess.set
-      ressource: '9eir0ul21knvmlhu0a4kleh8j1'
-      json: { 'hello': 'better world' }
-      cb: do_something()
+      id: '9eir0ul21knvmlhu0a4kleh8j1'
+      data: { 'hello': 'better world' }
+      , (res) ->
+        console.log "Received: #{res}"
+        # Do something with result...
+  ```
+
+## Run tests
+
+You can run unit-tests using mocha with:
+  ```sh
+    npm test
   ```
