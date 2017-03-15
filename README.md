@@ -10,6 +10,9 @@
 Simple module to manipulate PHP session vars ($_SESSION) stored in JSON, using *memcached*  
 >CAREFUL: this is NEW version of memcache !
 
+**Important:** This package is **NOT** backward compatible with 0.1.x versions... Be careful if you update your npm project...
+
+
 ## Install
 
 Install with npm:
